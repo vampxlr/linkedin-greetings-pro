@@ -1,0 +1,37 @@
+# Dependencies
+node_modules/
+package-lock.json
+
+# User Data & Sessions
+user_data/
+
+# Data & Logs
+data/
+logs/
+recordings/
+*.log
+
+# Environment Variables
+.env
+.env.local
+
+# IDE & Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS Files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Temporary Files
+*.tmp
+*.temp
+temp/
+tmp/
+
+# Brain/Artifacts (if not needed in repo)
+.gemini/

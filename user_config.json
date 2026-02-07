@@ -1,0 +1,12 @@
+{
+  "DRY_RUN": false,
+  "MAX_CARDS": 0,
+  "ACTION_DELAY": {
+    "min": 5000,
+    "max": 10000
+  },
+  "BETWEEN_CARDS_DELAY": {
+    "min": 10000,
+    "max": 15000
+  }
+}

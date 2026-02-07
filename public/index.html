@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LinkedIn Greetings Pro</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="background-animation"></div>
+    <div class="container">
+        <header>
+            <h1>LinkedIn Greetings <span class="accent">Pro</span></h1>
+            <button id="toggleBotBtn" class="status-badge btn-toggle">START BOT ▶</button>
+        </header>
+
+        <main class="dashboard">
+            <!-- 1. Live Logs Section (Top) -->
+            <!-- 1. Live Logs Section (Top) -->
+            <section class="log-section" id="logSection">
+                <div class="log-header">
+                    <h2>📝 Live Logs</h2>
+                    <button class="btn danger small" onclick="clearLogs()">Clear Logs</button>
+                </div>
+                <div class="terminal-wrapper">
+                    <div class="terminal-content" id="logWindow">
+                        <div class="log-entry info">[SYSTEM] Ready. Login to LinkedIn to start.</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 2. Controls Section (REMOVED) -->
+
+
+            <!-- 3. Session Section (Collapsible) -->
+            <section class="collapsible-section collapsed">
+                <div class="card">
+                    <div class="section-header" onclick="toggleSection(this)">
+                        <h2>🔐 Session</h2>
+                        <span class="toggle-icon">▼</span>
+                    </div>
+                    <div class="section-content">
+                        <div class="login-status">
+                            <span class="login-indicator" id="loginIndicator">⚫</span>
+                            <span id="loginEmail">Checking...</span>
+                        </div>
+                        <div class="login-controls">
+                            <button id="loginBtn" class="btn primary">Login to LinkedIn</button>
+                            <button id="logoutBtn" class="btn danger" disabled>Logout</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 4. Progress Section (Collapsible) -->
+            <section class="collapsible-section collapsed">
+                <div class="card">
+                    <div class="section-header" onclick="toggleSection(this)">
+                        <h2>📊 Progress</h2>
+                        <span class="toggle-icon">▼</span>
+                    </div>
+                    <div class="section-content">
+                        <div class="stats-grid">
+                            <div class="stat-item">
+                                <span class="stat-value" id="totalProcessed">0</span>
+                                <span class="stat-label">Profiles</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-value" id="totalLiked">0</span>
+                                <span class="stat-label">Liked</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-value" id="totalCommented">0</span>
+                                <span class="stat-label">Commented</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-value" id="errorCount">0</span>
+                                <span class="stat-label">Errors</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 5. Configuration Section (Collapsible) -->
+            <section class="collapsible-section collapsed">
+                <div class="card">
+                    <div class="section-header" onclick="toggleSection(this)">
+                        <h2>⚙️ Configuration</h2>
+                        <span class="toggle-icon">▼</span>
+                    </div>
+                    <div class="section-content">
+                        <!-- DRY RUN Toggle -->
+                        <div class="setting-group">
+                            <label>Test Mode (DRY RUN)</label>
+                            <div class="toggle-wrapper">
+                                <label class="toggle">
+                                    <input type="checkbox" id="dryRunToggle">
+                                    <span class="slider"></span>
+                                </label>
+                                <span class="toggle-label" id="dryRunLabel">OFF</span>
+                            </div>
+                            <small>When ON, bot simulates actions without clicking</small>
+                        </div>
+
+                        <!-- Action Delay -->
+                        <div class="setting-group">
+                            <label>Action Delay (before each click)</label>
+                            <div class="input-row">
+                                <div class="input-wrapper">
+                                    <div class="custom-spinner">
+                                        <button class="spin-btn"
+                                            onclick="adjustValue('actionDelayMin', -1000)">-</button>
+                                        <input type="number" id="actionDelayMin" value="5000" step="1000" readonly>
+                                        <button class="spin-btn"
+                                            onclick="adjustValue('actionDelayMin', 1000)">+</button>
+                                    </div>
+                                    <span class="input-label">Min (ms)</span>
+                                </div>
+                                <div class="input-wrapper">
+                                    <div class="custom-spinner">
+                                        <button class="spin-btn"
+                                            onclick="adjustValue('actionDelayMax', -1000)">-</button>
+                                        <input type="number" id="actionDelayMax" value="10000" step="1000" readonly>
+                                        <button class="spin-btn"
+                                            onclick="adjustValue('actionDelayMax', 1000)">+</button>
+                                    </div>
+                                    <span class="input-label">Max (ms)</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Between Cards Delay -->
+                        <div class="setting-group">
+                            <label>Between Cards Delay</label>
+                            <div class="input-row">
+                                <div class="input-wrapper">
+                                    <div class="custom-spinner">
+                                        <button class="spin-btn"
+                                            onclick="adjustValue('betweenDelayMin', -1000)">-</button>
+                                        <input type="number" id="betweenDelayMin" value="10000" step="1000" readonly>
+                                        <button class="spin-btn"
+                                            onclick="adjustValue('betweenDelayMin', 1000)">+</button>
+                                    </div>
+                                    <span class="input-label">Min (ms)</span>
+                                </div>
+                                <div class="input-wrapper">
+                                    <div class="custom-spinner">
+                                        <button class="spin-btn"
+                                            onclick="adjustValue('betweenDelayMax', -1000)">-</button>
+                                        <input type="number" id="betweenDelayMax" value="15000" step="1000" readonly>
+                                        <button class="spin-btn"
+                                            onclick="adjustValue('betweenDelayMax', 1000)">+</button>
+                                    </div>
+                                    <span class="input-label">Max (ms)</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- MAX CARDS -->
+                        <div class="setting-group">
+                            <label>Max Cards Per Run</label>
+                            <div class="input-row">
+                                <div class="input-wrapper" style="max-width: 200px;">
+                                    <div class="custom-spinner">
+                                        <button class="spin-btn" onclick="adjustCardValue('maxCards', -10)">-</button>
+                                        <input type="number" id="maxCards" value="10" min="0" readonly>
+                                        <button class="spin-btn" onclick="adjustCardValue('maxCards', 10)">+</button>
+                                    </div>
+                                    <span class="input-label">Cards (0 = infinite)</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button id="saveConfigBtn" class="btn secondary">💾 Save Config</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        // ============ Collapsible Sections ============
+        function toggleSection(header) {
+            const section = header.closest('.collapsible-section');
+            const content = section.querySelector('.section-content');
+            const icon = header.querySelector('.toggle-icon');
+
+            section.classList.toggle('collapsed');
+
+            if (section.classList.contains('collapsed')) {
+                content.style.maxHeight = '0px';
+                icon.textContent = '▼';
+            } else {
+                content.style.maxHeight = content.scrollHeight + 'px';
+                icon.textContent = '▲';
+            }
+        }
+
+        const socket = io();
+
+        // DOM Elements
+        const startBtn = document.getElementById('startBtn');
+        const stopBtn = document.getElementById('stopBtn');
+        const botStatus = document.getElementById('botStatus');
+        const toggleBotBtn = document.getElementById('toggleBotBtn');
+        const logWindow = document.getElementById('logWindow');
+        const loginBtn = document.getElementById('loginBtn');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const loginIndicator = document.getElementById('loginIndicator');
+        const loginEmail = document.getElementById('loginEmail');
+        const dryRunToggle = document.getElementById('dryRunToggle');
+        const dryRunLabel = document.getElementById('dryRunLabel');
+        const saveConfigBtn = document.getElementById('saveConfigBtn');
+
+        // ============ UI State ============
+
+        let isBotRunning = false;
+
+        function updateBotUI(running) {
+            isBotRunning = running;
+            if (running) {
+                toggleBotBtn.textContent = "⏹ STOP BOT";
+                toggleBotBtn.classList.add('running');
+            } else {
+                toggleBotBtn.textContent = "▶ START BOT";
+                toggleBotBtn.classList.remove('running');
+            }
+        }
+
+        function updateLoginUI(loggedIn, email) {
+            if (loggedIn) {
+                loginIndicator.textContent = "🟢";
+                loginEmail.textContent = email || "Logged In";
+                loginBtn.disabled = true;
+                logoutBtn.disabled = false;
+                toggleBotBtn.disabled = false;
+            } else {
+                loginIndicator.textContent = "🔴";
+                loginEmail.textContent = "Not logged in";
+                loginBtn.disabled = false;
+                logoutBtn.disabled = true;
+                toggleBotBtn.disabled = true;
+            }
+        }
+
+        // ============ Socket Events ============
+
+        socket.on('status', (status) => {
+            updateBotUI(status === 'running');
+            if (status === 'logging_in') {
+                toggleBotBtn.textContent = "⏳ LOGGING IN...";
+                toggleBotBtn.disabled = true;
+            }
+        });
+
+        // ============ Log Typewriter Logic ============
+        const logQueue = [];
+        let isTyping = false;
+
+        function typeMessage(container, text, speed = 2) {
+            return new Promise(resolve => {
+                let i = 0;
+                // Create cursor for this line
+                const cursor = document.createElement('span');
+                cursor.className = 'cursor';
+                container.appendChild(cursor);
+
+                function type() {
+                    if (i < text.length) {
+                        container.insertBefore(document.createTextNode(text.charAt(i)), cursor);
+                        i++;
+                        logWindow.scrollTop = logWindow.scrollHeight;
+                        setTimeout(type, speed);
+                    } else {
+                        // resolve without removing cursor
+                        resolve();
+                    }
+                }
+                type();
+            });
+        }
+
+        async function processLogQueue() {
+            if (isTyping || logQueue.length === 0) return;
+            isTyping = true;
+
+            // Remove ANY existing cursors from previous lines
+            const oldCursors = document.querySelectorAll('.log-entry .cursor');
+            oldCursors.forEach(el => el.remove());
+
+            const data = logQueue.shift();
+
+            // Create base entry
+            const entry = document.createElement('div');
+            entry.className = `log-entry ${data.type}`;
+            // Timestamp appears instantly
+            const timeStr = `[${data.timestamp || new Date().toLocaleTimeString()}]`;
+            entry.innerHTML = `<span class="timestamp">${timeStr}</span>`;
+            logWindow.appendChild(entry);
+
+            // Container for typed text
+            const msgSpan = document.createElement('span');
+            entry.appendChild(msgSpan);
+
+            // Type content (cursor stays after this)
+            await typeMessage(msgSpan, data.message);
+
+            // Keep history limits
+            while (logWindow.children.length > 200) {
+                logWindow.removeChild(logWindow.firstChild);
+            }
+
+            isTyping = false;
+            // Immediate check for next item
+            processLogQueue();
+        }
+
+        socket.on('log', (data) => {
+            // Strip ANSI codes
+            let message = data.message.replace(/\x1B\[[0-9;]*[a-zA-Z]/g, '');
+
+            // Refine type based on content
+            let type = data.type;
+            const lowerMsg = message.toLowerCase();
+
+            if (type === 'info' || type === 'action') {
+                if (message.includes('[SYSTEM]') || lowerMsg.includes('starting') || lowerMsg.includes('stopping') || lowerMsg.includes('ready')) {
+                    type = 'system';
+                } else if (lowerMsg.includes('analyz') || lowerMsg.includes('scan') || lowerMsg.includes('context for') || lowerMsg.includes('found')) {
+                    type = 'analysis';
+                } else if (lowerMsg.includes('success') || lowerMsg.includes('complet') || lowerMsg.includes('marked') || lowerMsg.includes('message sent')) {
+                    type = 'success';
+                } else if (lowerMsg.includes('skip') || lowerMsg.includes('already') || lowerMsg.includes('exist')) {
+                    type = 'warning';
+                } else if (lowerMsg.includes('navigat') || lowerMsg.includes('open') || lowerMsg.includes('click')) {
+                    type = 'action';
+                }
+            }
+
+            // Push to queue instead of direct render
+            logQueue.push({ type, message, timestamp: data.timestamp });
+            processLogQueue();
+        });
+
+        socket.on('stats', (data) => {
+            if (data.processed !== undefined) document.getElementById('totalProcessed').textContent = data.processed;
+            if (data.liked !== undefined) document.getElementById('totalLiked').textContent = data.liked;
+            if (data.commented !== undefined) document.getElementById('totalCommented').textContent = data.commented;
+            if (data.errors !== undefined) document.getElementById('errorCount').textContent = data.errors;
+        });
+
+        socket.on('processed-stats', (data) => {
+            document.getElementById('totalProcessed').textContent = data.entries || 0;
+            document.getElementById('totalLiked').textContent = data.liked || 0;
+            document.getElementById('totalCommented').textContent = data.commented || 0;
+        });
+
+        // ============ API Calls ============
+
+        async function loadConfig() {
+            try {
+                const res = await fetch('/api/config');
+                const data = await res.json();
+                if (data.success) {
+                    dryRunToggle.checked = data.config.DRY_RUN;
+                    dryRunLabel.textContent = data.config.DRY_RUN ? 'ON' : 'OFF';
+                    document.getElementById('actionDelayMin').value = data.config.ACTION_DELAY.min;
+                    document.getElementById('actionDelayMax').value = data.config.ACTION_DELAY.max;
+                    document.getElementById('betweenDelayMin').value = data.config.BETWEEN_CARDS_DELAY.min;
+                    document.getElementById('betweenDelayMax').value = data.config.BETWEEN_CARDS_DELAY.max;
+                    document.getElementById('maxCards').value = data.config.MAX_CARDS || 10;
+                }
+            } catch (e) { console.error(e); }
+        }
+
+        async function loadLoginStatus() {
+            try {
+                const res = await fetch('/api/login-status');
+                const data = await res.json();
+                updateLoginUI(data.loggedIn, data.email);
+            } catch (e) { console.error(e); }
+        }
+
+        async function loadProcessedStats() {
+            try {
+                const res = await fetch('/api/processed-stats');
+                const data = await res.json();
+                if (data.success) {
+                    document.getElementById('totalProcessed').textContent = data.entries || 0;
+                    document.getElementById('totalLiked').textContent = data.liked || 0;
+                    document.getElementById('totalCommented').textContent = data.commented || 0;
+                }
+            } catch (e) { console.error(e); }
+        }
+
+        // ============ Button Handlers ============
+
+        toggleBotBtn.addEventListener('click', async () => {
+            if (isBotRunning) {
+                // STOP
+                await fetch('/api/stop', { method: 'POST' });
+            } else {
+                // START
+                try {
+                    const res = await fetch('/api/start', { method: 'POST' });
+                    const data = await res.json();
+                    if (!data.success) alert(data.message);
+                } catch (e) { console.error(e); }
+            }
+        });
+
+        loginBtn.addEventListener('click', async () => {
+            loginBtn.disabled = true;
+            loginBtn.textContent = 'Opening browser...';
+            try {
+                await fetch('/api/login', { method: 'POST' });
+                // Poll for login completion
+                const checkLogin = setInterval(async () => {
+                    const res = await fetch('/api/login-status');
+                    const data = await res.json();
+                    if (data.loggedIn) {
+                        clearInterval(checkLogin);
+                        updateLoginUI(true, data.email);
+                        loginBtn.textContent = 'Login to LinkedIn';
+                    }
+                }, 2000);
+            } catch (e) {
+                console.error(e);
+                loginBtn.disabled = false;
+                loginBtn.textContent = 'Login to LinkedIn';
+            }
+        });
+
+        logoutBtn.addEventListener('click', async () => {
+            if (!confirm('This will clear your saved LinkedIn session. Continue?')) return;
+            try {
+                const res = await fetch('/api/logout', { method: 'POST' });
+                const data = await res.json();
+                if (data.success) {
+                    updateLoginUI(false);
+                }
+            } catch (e) { console.error(e); }
+        });
+
+        dryRunToggle.addEventListener('change', () => {
+            dryRunLabel.textContent = dryRunToggle.checked ? 'ON' : 'OFF';
+        });
+
+        saveConfigBtn.addEventListener('click', async () => {
+            const config = {
+                DRY_RUN: dryRunToggle.checked,
+                MAX_CARDS: parseInt(document.getElementById('maxCards').value),
+                ACTION_DELAY: {
+                    min: parseInt(document.getElementById('actionDelayMin').value),
+                    max: parseInt(document.getElementById('actionDelayMax').value)
+                },
+                BETWEEN_CARDS_DELAY: {
+                    min: parseInt(document.getElementById('betweenDelayMin').value),
+                    max: parseInt(document.getElementById('betweenDelayMax').value)
+                }
+            };
+
+            try {
+                const res = await fetch('/api/config', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(config)
+                });
+                const data = await res.json();
+                if (data.success) {
+                    saveConfigBtn.textContent = '✓ Saved!';
+                    setTimeout(() => saveConfigBtn.textContent = '💾 Save Config', 2000);
+                } else {
+                    alert('Failed to save: ' + data.error);
+                }
+            } catch (e) { console.error(e); }
+        });
+
+        function adjustValue(id, change) {
+            const input = document.getElementById(id);
+            let val = parseInt(input.value) + change;
+            if (val < 1000) val = 1000; // Minimum 1 second for delays
+            input.value = val;
+        }
+
+        function adjustCardValue(id, change) {
+            const input = document.getElementById(id);
+            let val = parseInt(input.value) + change;
+            if (val < 0) val = 0; // Minimum 0 (infinite mode)
+            input.value = val;
+        }
+
+        function clearLogs() {
+            logWindow.innerHTML = '<div class="log-entry info">[SYSTEM] Logs cleared.</div>';
+        }
+
+        // ============ Glow Effect ============
+        const glowElements = document.querySelectorAll('header, .card, .terminal-wrapper');
+        glowElements.forEach(el => {
+            el.addEventListener('mousemove', (e) => {
+                const rect = el.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                el.style.setProperty('--mouse-x', `${x}px`);
+                el.style.setProperty('--mouse-y', `${y}px`);
+            });
+        });
+
+        // ============ Init ============
+        loadConfig();
+        loadLoginStatus();
+        loadProcessedStats();
+
+        // Auto-refresh stats every 10 seconds
+        setInterval(loadProcessedStats, 10000);
+    </script>
+</body>
+
+</html>
