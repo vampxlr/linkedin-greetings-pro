@@ -55,24 +55,46 @@ async function run() {
             await navigator.goToCatchUp(page);
         }
 
-        // 2. Main Loop
+        // 2. Wait for catch-up container to load
         logger.info('Scanning Catch Up list...');
+        try {
+            await page.waitForSelector(config.SELECTORS.CATCH_UP_CONTAINER, { timeout: 15000 });
+            logger.info('Catch Up list container found.');
+        } catch (e) {
+            logger.warn('Catch Up container not found within 15s, will try scanning anyway...');
+        }
 
-        // Process max 10 cards for this safety run
+        // Process max cards for this safety run
         let processedCount = 0;
         const MAX_CARDS = 50;
+        let emptyScrollCount = 0;
+        const MAX_EMPTY_SCROLLS = 12; // Stop after 12 consecutive empty scrolls
 
         while (processedCount < MAX_CARDS) {
-            // Find all visible cards
-            const cards = await page.$$(config.SELECTORS.PROFILE_CARD);
+            // Find all visible cards within the list container
+            const container = await page.$(config.SELECTORS.CATCH_UP_CONTAINER);
+            let cards;
+            if (container) {
+                cards = await container.$$(config.SELECTORS.PROFILE_CARD);
+            } else {
+                cards = await page.$$(config.SELECTORS.PROFILE_CARD);
+            }
             logger.info(`Found ${cards.length} visible cards.`);
 
             if (cards.length === 0) {
-                logger.info('No more cards found. Scrolling...');
+                emptyScrollCount++;
+                if (emptyScrollCount >= MAX_EMPTY_SCROLLS) {
+                    logger.info(`No cards found after ${MAX_EMPTY_SCROLLS} scroll attempts. Ending.`);
+                    break;
+                }
+                logger.info(`No more cards found. Scrolling... (attempt ${emptyScrollCount}/${MAX_EMPTY_SCROLLS})`);
                 await interactor.humanScroll(page);
                 await page.waitForTimeout(3000);
                 continue;
             }
+
+            // Reset empty scroll counter when cards are found
+            emptyScrollCount = 0;
 
             // Iterate cards
             for (const card of cards) {

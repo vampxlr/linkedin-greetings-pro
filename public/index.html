@@ -175,6 +175,21 @@
                             </div>
                         </div>
 
+                        <!-- Log Animation Speed -->
+                        <div class="setting-group">
+                            <label>Log Animation Speed (Typewriter)</label>
+                            <div class="input-row">
+                                <div class="input-wrapper" style="max-width: 200px;">
+                                    <div class="custom-spinner">
+                                        <button class="spin-btn" onclick="adjustValue('animationSpeed', -1, 0)">-</button>
+                                        <input type="number" id="animationSpeed" value="2" min="0" readonly>
+                                        <button class="spin-btn" onclick="adjustValue('animationSpeed', 1, 0)">+</button>
+                                    </div>
+                                    <span class="input-label">ms per char (0 = instant)</span>
+                                </div>
+                            </div>
+                        </div>
+
                         <button id="saveConfigBtn" class="btn secondary">💾 Save Config</button>
                     </div>
                 </div>
@@ -261,8 +276,9 @@
         // ============ Log Typewriter Logic ============
         const logQueue = [];
         let isTyping = false;
+        let currentAnimationSpeed = 2;
 
-        function typeMessage(container, text, speed = 2) {
+        function typeMessage(container, text, speed = currentAnimationSpeed) {
             return new Promise(resolve => {
                 let i = 0;
                 // Create cursor for this line
@@ -271,6 +287,13 @@
                 container.appendChild(cursor);
 
                 function type() {
+                    if (speed === 0) {
+                        container.insertBefore(document.createTextNode(text), cursor);
+                        logWindow.scrollTop = logWindow.scrollHeight;
+                        resolve();
+                        return;
+                    }
+
                     if (i < text.length) {
                         container.insertBefore(document.createTextNode(text.charAt(i)), cursor);
                         i++;
@@ -374,6 +397,8 @@
                     document.getElementById('betweenDelayMin').value = data.config.BETWEEN_CARDS_DELAY.min;
                     document.getElementById('betweenDelayMax').value = data.config.BETWEEN_CARDS_DELAY.max;
                     document.getElementById('maxCards').value = data.config.MAX_CARDS || 10;
+                    document.getElementById('animationSpeed').value = data.config.TEXT_ANIMATION_SPEED || 0;
+                    currentAnimationSpeed = data.config.TEXT_ANIMATION_SPEED || 0;
                 }
             } catch (e) { console.error(e); }
         }
@@ -462,7 +487,8 @@
                 BETWEEN_CARDS_DELAY: {
                     min: parseInt(document.getElementById('betweenDelayMin').value),
                     max: parseInt(document.getElementById('betweenDelayMax').value)
-                }
+                },
+                TEXT_ANIMATION_SPEED: parseInt(document.getElementById('animationSpeed').value)
             };
 
             try {
@@ -474,6 +500,7 @@
                 const data = await res.json();
                 if (data.success) {
                     saveConfigBtn.textContent = '✓ Saved!';
+                    currentAnimationSpeed = config.TEXT_ANIMATION_SPEED;
                     setTimeout(() => saveConfigBtn.textContent = '💾 Save Config', 2000);
                 } else {
                     alert('Failed to save: ' + data.error);
@@ -481,10 +508,10 @@
             } catch (e) { console.error(e); }
         });
 
-        function adjustValue(id, change) {
+        function adjustValue(id, change, minVal = 1000) {
             const input = document.getElementById(id);
             let val = parseInt(input.value) + change;
-            if (val < 1000) val = 1000; // Minimum 1 second for delays
+            if (val < minVal) val = minVal; 
             input.value = val;
         }
 

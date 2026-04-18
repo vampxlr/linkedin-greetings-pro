@@ -65,7 +65,8 @@ app.get('/api/config', (req, res) => {
                 MAX_CARDS: config.MAX_CARDS,
                 ACTION_DELAY: config.ACTION_DELAY,
                 BETWEEN_CARDS_DELAY: config.BETWEEN_CARDS_DELAY,
-                SCROLL_VARIANCE: config.SCROLL_VARIANCE
+                SCROLL_VARIANCE: config.SCROLL_VARIANCE,
+                TEXT_ANIMATION_SPEED: config.TEXT_ANIMATION_SPEED
             }
         });
     } catch (err) {
@@ -106,6 +107,13 @@ app.post('/api/config', async (req, res) => {
             configContent = configContent.replace(
                 /BETWEEN_CARDS_DELAY:\s*\{\s*min:\s*\d+,\s*max:\s*\d+\s*\}/,
                 `BETWEEN_CARDS_DELAY: { min: ${updates.BETWEEN_CARDS_DELAY.min}, max: ${updates.BETWEEN_CARDS_DELAY.max} }`
+            );
+        }
+        
+        if (updates.TEXT_ANIMATION_SPEED !== undefined) {
+            configContent = configContent.replace(
+                /TEXT_ANIMATION_SPEED:\s*\d+/,
+                `TEXT_ANIMATION_SPEED: ${updates.TEXT_ANIMATION_SPEED}`
             );
         }
 
